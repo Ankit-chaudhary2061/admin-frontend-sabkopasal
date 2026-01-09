@@ -1,0 +1,208 @@
+import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
+import type { InitialState, OrderData, Product, User } from "../types/data-types";
+import { Status } from "../types/status-types";
+import type { AppDispatch } from "./store";
+import api from "../http/api";
+import apiWithToken from "../http/api-with-token";
+
+
+const initialState:InitialState={
+    orders:[],
+    products:[],
+    users:[],
+    singleProduct:null,
+    status:Status.LOADING
+}
+interface DeleteProduct{
+    productId :string
+}
+
+const dataSlice = createSlice({
+    name:'data',
+    initialState,
+    reducers:{
+         setStatus(state:InitialState, action:PayloadAction<Status>){
+            state.status =action.payload
+         },
+         setProducts(state:InitialState, action:PayloadAction<Product[]>){
+            state.products = action.payload
+         },
+         setOrders(state:InitialState, action:PayloadAction<OrderData[]>){
+            state.orders = action.payload
+         },
+           setSingleProduct(state:InitialState, action:PayloadAction<Product>){
+            state.singleProduct = action.payload
+         },
+         setUsers(state:InitialState, action:PayloadAction<User[]>){
+            state.users = action.payload
+         },
+           setDeleteProduct(state: InitialState, action: PayloadAction<DeleteProduct>) {
+  const index = state.products.findIndex(
+    (item) => item.id === action.payload.productId
+  );
+
+  if (index !== -1) {
+    state.products.splice(index, 1);
+  }
+},
+    setDeleteOrder(state: InitialState, action: PayloadAction<string>) {
+  const index = state.orders.findIndex(
+    (item) => item.id === action.payload
+  );
+
+  if (index !== -1) {
+    state.orders.splice(index, 1);
+  }
+}
+
+    }
+})
+
+
+export const {setOrders,setProducts,setStatus,setUsers,setSingleProduct,setDeleteProduct,setDeleteOrder} = dataSlice.actions
+export default dataSlice.reducer
+
+
+export function fetchProduct(){
+    return async function fetchProductThunk(dispatch : AppDispatch){
+        try {
+            const response =  await api.get('/admin/product')
+            if(response.status ===  200){
+                  const {data }=response.data
+                console.log(data,':dataa')
+                dispatch(setProducts(data))
+                dispatch(setStatus(Status.SUCCESS))
+            }else{
+                dispatch(setStatus(Status.ERROR))
+
+            }
+       } catch (error:any) {
+              console.error(error)
+
+               dispatch(setStatus(Status.ERROR))
+             
+            
+        }
+    }
+}
+export function fetchOrder(){
+    return async function fetchOrderThunk(dispatch:AppDispatch){
+        try {
+            const response = await apiWithToken.get('/admin/orders')
+            if(response.status === 200 || 201){
+                dispatch(setOrders(response.data.data))
+                dispatch(setStatus(Status.SUCCESS))
+             
+            }else{
+                dispatch(setStatus(Status.ERROR))
+
+            }
+        } catch (error) {
+            console.log(error)            
+                dispatch(setStatus(Status.ERROR))
+            
+        }
+    }
+}
+
+export function deleteOrder(id :string){
+    return async function deleteOrderThunk(dispatch:AppDispatch){
+        try {
+            const response = await apiWithToken.delete('/admin/order/' +id)
+            if(response.status === 200 || 201){
+               
+                dispatch(setStatus(Status.SUCCESS))
+                dispatch(setDeleteOrder(id))
+              
+            }else{
+                dispatch(setStatus(Status.ERROR))
+
+            }
+        } catch (error) {
+            console.log(error)            
+                dispatch(setStatus(Status.ERROR))
+            
+        }
+    }
+}
+export function fetchUsers(){
+    return async function fetchUsersThunk(dispatch:AppDispatch){
+        try {
+            const response = await apiWithToken.get('/users')
+            if(response.status === 200 || 201){
+                dispatch(setUsers(response.data.data))
+                dispatch(setStatus(Status.SUCCESS))
+             
+            }else{
+                dispatch(setStatus(Status.ERROR))
+
+            }
+        } catch (error) {
+            console.log(error)            
+                dispatch(setStatus(Status.ERROR))
+            
+        }
+    }
+}
+
+
+export function addProduct(data :Product){
+    return async function addProductThunk(dispatch:AppDispatch){
+        try {
+            const response = await apiWithToken.post('/admin/product', data)
+            if(response.status === 200 || 201){
+               
+                dispatch(setStatus(Status.SUCCESS))
+              
+            }else{
+                dispatch(setStatus(Status.ERROR))
+
+            }
+        } catch (error) {
+            console.log(error)            
+                dispatch(setStatus(Status.ERROR))
+            
+        }
+    }
+}
+export function deleteProduct(id :string){
+    return async function deleteProductThunk(dispatch:AppDispatch){
+        try {
+            const response = await apiWithToken.delete('/admin/product' +id)
+            if(response.status === 200 || 201){
+               
+                dispatch(setStatus(Status.SUCCESS))
+               
+              
+            }else{
+                dispatch(setStatus(Status.ERROR))
+
+            }
+        } catch (error) {
+            console.log(error)            
+                dispatch(setStatus(Status.ERROR))
+            
+        }
+    }
+}
+
+export function singleProduct(id :string){
+    return async function singleProductThunk(dispatch:AppDispatch){
+        try {
+            const response = await apiWithToken.delete('/admin/product' + id)
+            if(response.status === 200 || 201){
+               
+                dispatch(setStatus(Status.SUCCESS))
+                dispatch(setSingleProduct(response.data.data))
+              
+            }else{
+                dispatch(setStatus(Status.ERROR))
+
+            }
+        } catch (error) {
+            console.log(error)            
+                dispatch(setStatus(Status.ERROR))
+            
+        }
+    }
+}
