@@ -1,8 +1,9 @@
 
 'use client'
 
-import { fetchUsers } from "@/src/lib/store/data-slice";
+import { deleteUser, fetchUsers } from "@/src/lib/store/data-slice";
 import { useAppDispatch, useAppSelector } from "@/src/lib/store/hook";
+import { TrashIcon } from "lucide-react";
 
 import { useEffect, useState } from "react";
 
@@ -18,6 +19,12 @@ console.log(users)
 useEffect(()=>{
     dispatch(fetchUsers())
 },[])
+const handleDelete = async(id:string)=>{
+  if(!id) return
+  await dispatch(deleteUser(id))
+  console.log(id,':userid')
+  dispatch(fetchUsers())
+}
 const userFilter = users.filter((user)=> user.username.toLowerCase().includes(searchedText.toLowerCase()) ||
       user.email.includes(searchedText) ||
       user.id.includes(searchedText))
@@ -70,7 +77,7 @@ const userFilter = users.filter((user)=> user.username.toLowerCase().includes(se
                 <th className="px-6 py-3">ID</th>
                 <th className="px-6 py-3">Name</th>
                 <th className="px-6 py-3">Email</th>
-           
+              <th className="px-6 py-3 text-center">Actions</th> 
              
               </tr>
             </thead>
@@ -83,6 +90,24 @@ const userFilter = users.filter((user)=> user.username.toLowerCase().includes(se
                     <td className="px-6 py-3 font-medium">{user.username}</td>
                     <td className="px-6 py-3">{user.email}</td>
                     
+                    <td className="px-6 py-3">
+                      <div className="flex justify-center gap-3">
+                        {/* <button className="p-2 bg-indigo-100 rounded-full hover:bg-indigo-200 transition">
+                          <PencilIcon className="w-5 h-5 text-indigo-600" />
+                        </button> */}
+
+                        <button
+                        onClick={() =>  handleDelete(user.id)}
+                          className="p-2 bg-red-100 rounded-full hover:bg-red-200 transition"
+                        >
+                          <TrashIcon className="w-5 h-5 text-red-600" />
+                        </button>
+
+                        {/* <button className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition">
+                          <EllipsisHorizontalIcon className="w-5 h-5 text-gray-600" />
+                        </button> */}
+                      </div>
+                    </td> 
 
                
                   </tr>
