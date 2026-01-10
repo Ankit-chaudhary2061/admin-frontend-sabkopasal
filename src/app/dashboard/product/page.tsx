@@ -9,11 +9,17 @@ import {
   TrashIcon,
   EllipsisHorizontalIcon,
 } from "@heroicons/react/24/outline";
+import ProductModal from "@/src/lib/components/modal/productModal";
 
 const product = () => {
   const dispatch = useAppDispatch();
   const { products } = useAppSelector((store) => store.datas);
   const [searchedText, setSearchedText] = useState<string>("");
+   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+
+  const openModal = () => setIsModalOpen(true);
+  const closedModal = () => setIsModalOpen(false);
+
 console.log(products,':product')
   useEffect(() => {
     dispatch(fetchProduct());
@@ -27,7 +33,7 @@ const filterProduct = products.filter((product) =>
     .toString()
     .includes(searchedText)
 );
-const handleDelete = async (id: string) => {
+const handleDelete = async (id?: string) => {
   if (!id) return;
 
   await dispatch(deleteProduct(id));
@@ -39,7 +45,7 @@ const handleDelete = async (id: string) => {
    <div className="p-6 bg-gray-100 min-h-screen">
       <div className="max-w-6xl mx-auto bg-white shadow-md rounded-2xl p-6">
 
-        {/* {isModalOpen && <TeacherModal closedModal={closedModal} />} */}
+        {isModalOpen && <ProductModal closedModal={closedModal} />}
 
         {/* Top Bar */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
@@ -73,7 +79,7 @@ const handleDelete = async (id: string) => {
             </div>
 
             <button
-              // onClick={openModal}
+              onClick={openModal}
               className="px-5 py-2.5 bg-green-600 text-white rounded-full shadow hover:bg-green-700 transition"
             >
               + Add Products
