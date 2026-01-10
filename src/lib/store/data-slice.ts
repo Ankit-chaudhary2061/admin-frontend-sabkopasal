@@ -176,7 +176,10 @@ return async function  deleteUserThunk(dispatch:AppDispatch){
 export function addProduct(data :Product){
     return async function addProductThunk(dispatch:AppDispatch){
         try {
-            const response = await apiWithToken.post('/admin/product', data)
+            const response = await apiWithToken.post('/admin/product', data,{
+                headers:{
+                    "Content-Type" : "multipart/form-data"
+                }})
             if(response.status === 200 || 201){
                
                 dispatch(setStatus(Status.SUCCESS))
@@ -192,6 +195,38 @@ export function addProduct(data :Product){
         }
     }
 }
+// export function addProduct(data: Product) {
+//   return async function addProductThunk(dispatch: AppDispatch) {
+//     try {
+//       const formData = new FormData();
+
+//       formData.append("productName", data.productName);
+//       formData.append("productDescription", data.productDescription);
+//       formData.append("productPrice", String(data.productPrice));
+//       formData.append("productTotalStockQty", String(data.productTotalStockQty));
+//       formData.append("categoryId", data.categoryId);
+
+//       // 👇 THIS MUST MATCH multer.single("image")
+//       formData.append("image", data.productImageUrl as any);
+
+//       const response = await apiWithToken.post(
+//         "/admin/product",
+//         formData
+//       );
+
+//       if (response.status === 200 || response.status === 201) {
+//         dispatch(setStatus(Status.SUCCESS));
+//       } else {
+//         dispatch(setStatus(Status.ERROR));
+//       }
+//     } catch (error) {
+//       console.log(error);
+//       dispatch(setStatus(Status.ERROR));
+//     }
+//   };
+// }
+
+
 export function deleteProduct(id :string){
     return async function deleteProductThunk(dispatch:AppDispatch){
         try {

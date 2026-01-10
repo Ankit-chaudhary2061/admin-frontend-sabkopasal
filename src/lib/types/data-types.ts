@@ -51,10 +51,10 @@ export interface OrderData{
 }
 
 export interface Product{
-    id:string,
+    id?:string,
     productName:string,
     productDescription:string,
-    productImageUrl:string,
+    productImageUrl:File | null,
     productPrice : number,
     productTotalStockQty:number
     createdAt? :string,
