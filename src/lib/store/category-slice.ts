@@ -1,9 +1,10 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { CategoryState } from "../types/category-types";
+import { CategoryState, ICategory } from "../types/category-types";
 import { Status } from "../types/status-types";
 import { Category } from "../types/data-types";
 import { AppDispatch } from "./store";
 import api from "../http/api";
+import apiWithToken from "../http/api-with-token";
 
 
 const initialState:CategoryState = {
@@ -21,20 +22,43 @@ const categorySlice = createSlice({
         }, 
         setStatus(state:CategoryState, action : PayloadAction<Status>){
             state.status = action.payload
+        },
+          setDeleteCategory(state: CategoryState, action: PayloadAction<string>) {
+          const index = state.category.findIndex(
+            (item) => item.id === action.payload
+          );
+        
+          if (index !== -1) {
+            state.category.splice(index, 1);
+          }
         }
     }
 })
 
-export const{setCategory,setStatus} = categorySlice.actions
+export const{setCategory,setStatus, setDeleteCategory} = categorySlice.actions
 export default  categorySlice.reducer
 
 
 
-// export function addCategory(){
-//     return async function addCategoryThunk(dispatch){
+export function addCategory(data :ICategory){
+    return async function addXCategoryThunk(dispatch:AppDispatch){
+        try {
+            const response = await apiWithToken.post('/admin/category', data)
+            if(response.status === 200 || 201){
+               
+                dispatch(setStatus(Status.SUCCESS))
+              
+            }else{
+                dispatch(setStatus(Status.ERROR))
 
-//     }
-// }
+            }
+        } catch (error) {
+            console.log(error)            
+                dispatch(setStatus(Status.ERROR))
+            
+        }
+    }
+}
 
 
 export function fetchCategory(){
@@ -52,6 +76,27 @@ export function fetchCategory(){
         } catch (error : any) {
             console.log(error)
               dispatch(setStatus(Status.ERROR))
+            
+        }
+    }
+}
+
+export function deleteCategory(id :string){
+    return async function deleteCategoryThunk(dispatch:AppDispatch){
+        try {
+               const response = await apiWithToken.delete(`/admin/category/${id}`)
+            if(response.status === 200 || 201){
+               
+                dispatch(setStatus(Status.SUCCESS))
+                dispatch(setDeleteCategory(id))
+              
+            }else{
+                dispatch(setStatus(Status.ERROR))
+
+            }
+        } catch (error) {
+            console.log(error)            
+                dispatch(setStatus(Status.ERROR))
             
         }
     }
