@@ -36,6 +36,11 @@ const menu = [
     href: "/dashboard/user",
     icon: Layers,
   },
+    {
+    name: "Categories",
+    href: "/dashboard/category",
+    icon: Layers,
+  },
 ];
 
 const Sidebar = () => {
