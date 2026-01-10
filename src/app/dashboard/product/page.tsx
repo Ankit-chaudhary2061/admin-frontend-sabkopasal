@@ -1,7 +1,7 @@
 'use client'
 
 
-import { fetchProduct } from "@/src/lib/store/data-slice";
+import { deleteProduct, fetchProduct } from "@/src/lib/store/data-slice";
 import { useAppDispatch, useAppSelector } from "@/src/lib/store/hook";
 import { useEffect, useState } from "react";
 import {
@@ -14,10 +14,10 @@ const product = () => {
   const dispatch = useAppDispatch();
   const { products } = useAppSelector((store) => store.datas);
   const [searchedText, setSearchedText] = useState<string>("");
-
+console.log(products,':product')
   useEffect(() => {
     dispatch(fetchProduct());
-  }, [dispatch]);
+  }, []);
 const filterProduct = products.filter((product) =>
   product.productName.toLowerCase().includes(searchedText.toLowerCase()) ||
   product.Category?.categoryName
@@ -27,6 +27,13 @@ const filterProduct = products.filter((product) =>
     .toString()
     .includes(searchedText)
 );
+const handleDelete = async (id: string) => {
+  if (!id) return;
+
+  await dispatch(deleteProduct(id));
+  dispatch(fetchProduct());
+};
+
 
   return (
    <div className="p-6 bg-gray-100 min-h-screen">
@@ -121,7 +128,7 @@ const filterProduct = products.filter((product) =>
                         </button>
 
                         <button
-                          // onClick={() => handleDelete(teacher.id)}
+                        onClick={() =>  handleDelete(product.id)}
                           className="p-2 bg-red-100 rounded-full hover:bg-red-200 transition"
                         >
                           <TrashIcon className="w-5 h-5 text-red-600" />
@@ -140,7 +147,7 @@ const filterProduct = products.filter((product) =>
                     colSpan={7}
                     className="text-center py-8 text-gray-500 text-lg"
                   >
-                    😕 No teachers found
+                    😕 No products found
                   </td>
                 </tr>
               )}

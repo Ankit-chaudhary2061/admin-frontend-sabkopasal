@@ -51,7 +51,7 @@ export interface OrderData{
 }
 
 export interface Product{
-    id?:string,
+    id:string,
     productName:string,
     productDescription:string,
     productImageUrl:string,

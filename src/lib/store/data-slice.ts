@@ -13,9 +13,7 @@ const initialState:InitialState={
     singleProduct:null,
     status:Status.LOADING
 }
-interface DeleteProduct{
-    productId :string
-}
+
 
 const dataSlice = createSlice({
     name:'data',
@@ -36,9 +34,9 @@ const dataSlice = createSlice({
          setUsers(state:InitialState, action:PayloadAction<User[]>){
             state.users = action.payload
          },
-           setDeleteProduct(state: InitialState, action: PayloadAction<DeleteProduct>) {
+           setDeleteProduct(state: InitialState, action: PayloadAction<string>) {
   const index = state.products.findIndex(
-    (item) => item.id === action.payload.productId
+    (item) => item.id === action.payload
   );
 
   if (index !== -1) {
@@ -53,13 +51,22 @@ const dataSlice = createSlice({
   if (index !== -1) {
     state.orders.splice(index, 1);
   }
+},
+    setDeleteUser(state: InitialState, action: PayloadAction<string>) {
+  const index = state.users.findIndex(
+    (item) => item.id === action.payload
+  );
+
+  if (index !== -1) {
+    state.users.splice(index, 1);
+  }
 }
 
     }
 })
 
 
-export const {setOrders,setProducts,setStatus,setUsers,setSingleProduct,setDeleteProduct,setDeleteOrder} = dataSlice.actions
+export const {setOrders,setProducts,setStatus,setUsers,setSingleProduct,setDeleteProduct,setDeleteOrder, setDeleteUser} = dataSlice.actions
 export default dataSlice.reducer
 
 
@@ -144,7 +151,27 @@ export function fetchUsers(){
         }
     }
 }
+export function deleteUser(id:string){
+return async function  deleteUserThunk(dispatch:AppDispatch){
+    try {
+        const response = await apiWithToken.delete(`/users/${id}`)
 
+            if(response.status === 200 || 201){
+               
+                dispatch(setStatus(Status.SUCCESS))
+                dispatch(deleteUser(id))
+               
+              
+            }else{
+                dispatch(setStatus(Status.ERROR))
+
+            } 
+    } catch (error) {
+        console.log(error)            
+                dispatch(setStatus(Status.ERROR)) 
+    }
+}
+}
 
 export function addProduct(data :Product){
     return async function addProductThunk(dispatch:AppDispatch){
@@ -168,10 +195,12 @@ export function addProduct(data :Product){
 export function deleteProduct(id :string){
     return async function deleteProductThunk(dispatch:AppDispatch){
         try {
-            const response = await apiWithToken.delete('/admin/product' +id)
+            const response = await apiWithToken.delete(`/admin/product/${id}`)
+
             if(response.status === 200 || 201){
                
                 dispatch(setStatus(Status.SUCCESS))
+                dispatch(deleteProduct(id))
                
               
             }else{
