@@ -4,6 +4,7 @@ import { deleteOrder, fetchOrder } from '@/src/lib/store/data-slice';
 import { useAppDispatch, useAppSelector } from '@/src/lib/store/hook';
 import { OrderStatus } from '@/src/lib/types/data-types';
 import { TrashIcon } from 'lucide-react';
+import Link from 'next/link';
 import { useEffect } from 'react';
 
 
@@ -80,7 +81,7 @@ dispatch(deleteOrder(id))
                 orders.map((order) => (
               <tr key={order.id} className="hover:bg-gray-50 transition">
                     <td className="px-6 py-3 font-medium">
-                      {order.id}
+                     <Link href={`/order/${order.id}`}>{order.id}</Link> 
                     </td>
 
                     <td className="px-6 py-3">
