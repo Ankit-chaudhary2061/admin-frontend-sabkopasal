@@ -81,7 +81,7 @@ dispatch(deleteOrder(id))
                 orders.map((order) => (
               <tr key={order.id} className="hover:bg-gray-50 transition">
                     <td className="px-6 py-3 font-medium">
-                     <Link href={`/order/${order.id}`}>{order.id}</Link> 
+                     <Link href={`/dashboard/order/${order.id}`}>{order.id}</Link> 
                     </td>
 
                     <td className="px-6 py-3">

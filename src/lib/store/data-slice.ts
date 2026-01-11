@@ -1,5 +1,5 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import type { InitialState, OrderData, Product, User } from "../types/data-types";
+import type { InitialState, OrderData, Product, SingleOrder, User } from "../types/data-types";
 import { Status } from "../types/status-types";
 import type { AppDispatch } from "./store";
 import api from "../http/api";
@@ -11,6 +11,7 @@ const initialState:InitialState={
     products:[],
     users:[],
     singleProduct:null,
+    singleOrder:[],
     status:Status.LOADING
 }
 
@@ -30,6 +31,9 @@ const dataSlice = createSlice({
          },
            setSingleProduct(state:InitialState, action:PayloadAction<Product>){
             state.singleProduct = action.payload
+         },
+          setSingleOrder(state:InitialState, action:PayloadAction<SingleOrder[]>){
+            state.singleOrder = action.payload
          },
          setUsers(state:InitialState, action:PayloadAction<User[]>){
             state.users = action.payload
@@ -66,7 +70,7 @@ const dataSlice = createSlice({
 })
 
 
-export const {setOrders,setProducts,setStatus,setUsers,setSingleProduct,setDeleteProduct,setDeleteOrder, setDeleteUser} = dataSlice.actions
+export const {setOrders,setSingleOrder,setProducts,setStatus,setUsers,setSingleProduct,setDeleteProduct,setDeleteOrder, setDeleteUser} = dataSlice.actions
 export default dataSlice.reducer
 
 
@@ -253,7 +257,7 @@ export function deleteProduct(id :string){
 export function singleProduct(id :string){
     return async function singleProductThunk(dispatch:AppDispatch){
         try {
-            const response = await apiWithToken.delete('/admin/product' + id)
+            const response = await apiWithToken.get('/admin/product' + id)
             if(response.status === 200 || 201){
                
                 dispatch(setStatus(Status.SUCCESS))
@@ -270,3 +274,47 @@ export function singleProduct(id :string){
         }
     }
 }
+
+
+export function singleOrder(id :string){
+    return async function singleOrderThunk(dispatch:AppDispatch){
+        try {
+            const response = await apiWithToken.get(`/admin/order/${id}`)
+            if(response.status === 200 || 201){
+               
+                dispatch(setStatus(Status.SUCCESS))
+                dispatch(setSingleOrder(response.data.data))
+              
+            }else{
+                dispatch(setStatus(Status.ERROR))
+
+            }
+        } catch (error) {
+            console.log(error)            
+                dispatch(setStatus(Status.ERROR))
+            
+        }
+    }
+}
+
+
+// export function handleOrderStatus(status:string,id :string){
+//     return async function singleOrderThunk(dispatch:AppDispatch){
+//         try {
+//             const response = await apiWithToken.get(`/admin/order/${id}/status`)
+//             if(response.status === 200 || 201){
+               
+//                 dispatch(setStatus(Status.SUCCESS))
+//                 dispatch(setOrderStatus({id,status}))
+              
+//             }else{
+//                 dispatch(setStatus(Status.ERROR))
+
+//             }
+//         } catch (error) {
+//             console.log(error)            
+//                 dispatch(setStatus(Status.ERROR))
+            
+//         }
+//     }
+// }
