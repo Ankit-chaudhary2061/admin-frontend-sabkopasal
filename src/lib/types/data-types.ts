@@ -40,6 +40,8 @@ export interface Category{
     categoryName:string
 }
 
+
+
 export interface OrderData{
     phoneNumber:string,
     shippingAddress:string,
@@ -66,13 +68,48 @@ export interface Product{
 }
 
 
-
-
+export interface SingleOrder{
+ id: string,
+            quantity: number,
+           
+            orderId:string,
+            createdAt:string,
+            Product: {
+                id: string,
+                productName: string,
+               
+                productPrice: number,
+                productTotalStockQty: number
+                productImageUrl: string,
+               
+                categoryId:string,
+                Category: {
+                    categoryName?: string
+                }
+            },
+            Order: {
+                id: string,
+                phoneNumber: string,
+                shippingAddress: string,
+                totalAmount:number,
+                orderStatus: OrderStatus,
+               
+                Payment: {
+                    paymentMethod: string,
+                    paymentStatus: string
+                },
+                User: {
+                    username: string,
+                    email: string
+                }
+}
+}
 
 export interface InitialState{
     products:Product[],
     users:User[],
     orders:OrderData[],
     status:Status,
-    singleProduct:Product | null
+    singleProduct:Product | null,
+    singleOrder:SingleOrder[]
 }
