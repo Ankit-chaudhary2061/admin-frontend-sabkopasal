@@ -1,5 +1,5 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import type { InitialState, OrderData, Product, SingleOrder, User } from "../types/data-types";
+import type { InitialState, OrderData, OrderStatus, Product, SingleOrder, User } from "../types/data-types";
 import { Status } from "../types/status-types";
 import type { AppDispatch } from "./store";
 import api from "../http/api";
@@ -64,13 +64,23 @@ const dataSlice = createSlice({
   if (index !== -1) {
     state.users.splice(index, 1);
   }
-}
+},
+updateStatusById(state: InitialState, action: PayloadAction<{id:string, status:OrderStatus}>) {
+  const index = state.orders.findIndex(
+    (item) => item.id === action.payload.id
+  );
+
+  if (index !== -1) {
+    state.orders[index].orderStatus =action.payload.status as OrderStatus
+  }
+},
+
 
     }
 })
 
 
-export const {setOrders,setSingleOrder,setProducts,setStatus,setUsers,setSingleProduct,setDeleteProduct,setDeleteOrder, setDeleteUser} = dataSlice.actions
+export const {setOrders,setSingleOrder,setProducts,setStatus,setUsers,setSingleProduct,setDeleteProduct,setDeleteOrder, setDeleteUser,updateStatusById} = dataSlice.actions
 export default dataSlice.reducer
 
 
@@ -298,23 +308,27 @@ export function singleOrder(id :string){
 }
 
 
-// export function handleOrderStatus(status:string,id :string){
-//     return async function singleOrderThunk(dispatch:AppDispatch){
-//         try {
-//             const response = await apiWithToken.get(`/admin/order/${id}/status`)
-//             if(response.status === 200 || 201){
-               
-//                 dispatch(setStatus(Status.SUCCESS))
-//                 dispatch(setOrderStatus({id,status}))
-              
-//             }else{
-//                 dispatch(setStatus(Status.ERROR))
+export function handleOrderStatusById(status: OrderStatus, id: string) {
+  return async function handleOrderStatusThunkById(dispatch: AppDispatch) {
+    try {
+      const response = await apiWithToken.patch(
+        `/admin/order/${id}/status`,
+        {
+          orderStatus: status
+        }
+      );
 
-//             }
-//         } catch (error) {
-//             console.log(error)            
-//                 dispatch(setStatus(Status.ERROR))
-            
-//         }
-//     }
-// }
+      if (response.status === 200 || response.status === 201) {
+        dispatch(setStatus(Status.SUCCESS));
+
+        // Optimistic UI update
+        dispatch(updateStatusById({ id, status }));
+      } else {
+        dispatch(setStatus(Status.ERROR));
+      }
+    } catch (error) {
+      console.error("Update Order Status Error:", error);
+      dispatch(setStatus(Status.ERROR));
+    }
+  };
+}
