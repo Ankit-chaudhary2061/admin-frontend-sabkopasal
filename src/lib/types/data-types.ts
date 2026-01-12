@@ -93,6 +93,8 @@ export interface SingleOrder{
                 shippingAddress: string,
                 totalAmount:number,
                 orderStatus: OrderStatus,
+           userId:string,
+
                
                 Payment: {
                     paymentMethod: string,
